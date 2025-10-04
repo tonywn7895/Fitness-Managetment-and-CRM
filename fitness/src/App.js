@@ -5,7 +5,17 @@ import Login from './components/Login';
 import Dashboard from './components/Dashboard';
 import SalesOverview from './components/SalesOverview';
 import CustomerManagement from './components/CustomerManagement';
-import LandingPage from './components/LandingPage'; // Component ใหม่สำหรับหน้า Public
+
+//customer page
+import LandingPage from './components/LandingPage'; 
+import Home from './components/Home';
+import AboutUs from './components/AboutUs';
+import MembershipPlan from './components/MembershipPlan';
+import Contact from './components/Contact';
+import CustomerLogin from './components/Cust_Login';
+import Profile from './components/Profile';
+import Password from './components/ChangePassword';
+import WorkoutLog from './components/WorkoutLog';
 import { useState, useEffect } from 'react';
 
 function App() {
@@ -32,7 +42,17 @@ function App() {
     <Router>
       <Routes>
         {/* Public Route - หน้า Landing Page สำหรับลูกค้า */}
-        <Route path="/" element={<LandingPage />} />
+        <Route path="/register" element={<LandingPage />} />
+
+        
+        <Route path="/" element={<Home />} />
+        <Route path="/About Us" element={<AboutUs />} />
+        <Route path="/MembershipPlan" element={<MembershipPlan />} />
+        <Route path="/Contact" element={<Contact />} />
+        <Route path="/Login" element={<CustomerLogin />} />
+        <Route path="/Profile" element={<Profile />} />
+        <Route path="/Password" element={<Password />} />
+        <Route path="/Workout Log" element={<WorkoutLog />} />
 
         {/* Protected Routes - ต้องล็อกอิน */}
         <Route
