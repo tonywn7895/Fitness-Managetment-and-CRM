@@ -42,13 +42,19 @@ const Dashboard = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
+        const token = localStorage.getItem("token");
+        const headers = {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        };
+
         const [membersRes, salesRes, pointsRes, trendRes, growthRes] =
           await Promise.all([
-            fetch("http://localhost:5001/api/customers/count"),
-            fetch("http://localhost:5001/api/sales"),
-            fetch("http://localhost:5001/api/points/total/all"),
-            fetch("http://localhost:5001/api/sales/daily"),
-            fetch("http://localhost:5001/api/members/growth"),
+            fetch("http://localhost:5001/api/customers/count", { headers }),
+            fetch("http://localhost:5001/api/sales", { headers }),
+            fetch("http://localhost:5001/api/points/total/all", { headers }),
+            fetch("http://localhost:5001/api/sales/daily", { headers }),
+            fetch("http://localhost:5001/api/members/growth", { headers }),
           ]);
 
         if (!membersRes.ok) throw new Error(`Members API failed`);
@@ -92,7 +98,7 @@ const Dashboard = () => {
         setError(err.message);
         console.error("Fetch error:", err);
 
-        // ✅ Fallback Dummy Data
+        // ✅ Fallback Dummy Data (จากของคุณ)
         setKpi({ members: 10, sales: 5000, points: 2000 });
         setSalesData([
           { date: formatDate("2025-08-01"), amount: 1000 },
@@ -158,7 +164,7 @@ const Dashboard = () => {
         </CardContent>
       </Card>
 
-      {/* Member Growth Stacked Bar Chart */}
+      {/* Member Growth */}
       <Card>
         <CardContent className="p-4">
           <h2 className="text-lg font-semibold mb-4">Member Growth</h2>

@@ -31,3 +31,4 @@ yarn-error.log*
 *.sqlite
 *.db
 *.log
+node_modules/

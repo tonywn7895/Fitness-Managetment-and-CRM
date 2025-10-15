@@ -3,18 +3,21 @@ import Sidebar from './components/Sidebar';
 import Header from './components/Header';
 import Login from './components/Login';
 import Dashboard from './components/Dashboard';
+import PlansAdmin from './components/PlansAdmin';
+import ProductsAdmin from './components/ProductsAdmin';
 import SalesOverview from './components/SalesOverview';
 import CustomerManagement from './components/CustomerManagement';
 
-//customer page
+// customer pages
 import LandingPage from './components/LandingPage'; 
 import Home from './components/Home';
 import AboutUs from './components/AboutUs';
 import MembershipPlan from './components/MembershipPlan';
+import Shop from './components/Shop';
 import Contact from './components/Contact';
 import CustomerLogin from './components/Cust_Login';
 import Profile from './components/Profile';
-import MyPlan from "./components/MyPlan";
+import MyPlan from './components/MyPlan';
 import Password from './components/ChangePassword';
 import WorkoutLog from './components/WorkoutLog';
 import { useState, useEffect } from 'react';
@@ -42,13 +45,12 @@ function App() {
   return (
     <Router>
       <Routes>
-        {/* Public Route - หน้า Landing Page สำหรับลูกค้า */}
+        {/* 🌐 Public Routes */}
         <Route path="/register" element={<LandingPage />} />
-
-        
         <Route path="/" element={<Home />} />
         <Route path="/About Us" element={<AboutUs />} />
         <Route path="/MembershipPlan" element={<MembershipPlan />} />
+        <Route path="/Shop" element={<Shop />} />
         <Route path="/Contact" element={<Contact />} />
         <Route path="/Login" element={<CustomerLogin />} />
         <Route path="/Profile" element={<Profile />} />
@@ -56,7 +58,7 @@ function App() {
         <Route path="/Password" element={<Password />} />
         <Route path="/Workout Log" element={<WorkoutLog />} />
 
-        {/* Protected Routes - ต้องล็อกอิน */}
+        {/* 🔒 Admin Protected Routes */}
         <Route
           path="/admin/*"
           element={
@@ -66,10 +68,12 @@ function App() {
                 <Sidebar onLogout={handleLogout} />
                 <div className="ml-64 p-6">
                   <Routes>
-                    <Route index element={<Navigate to="/admin/dashboard" replace />} /> {/* Default ไป Dashboard */}
+                    <Route index element={<Navigate to="/admin/dashboard" replace />} />
                     <Route path="dashboard" element={<Dashboard />} />
                     <Route path="sales-overview" element={<SalesOverview />} />
                     <Route path="customer-management" element={<CustomerManagement />} />
+                    <Route path="plans" element={<PlansAdmin />} />
+                    <Route path="products" element={<ProductsAdmin />} />
                   </Routes>
                 </div>
               </>
@@ -79,7 +83,7 @@ function App() {
           }
         />
 
-        {/* Login Route */}
+        {/* 🔐 Admin Login */}
         <Route path="/admin/login" element={<Login onLogin={handleLogin} />} />
       </Routes>
     </Router>

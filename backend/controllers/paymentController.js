@@ -4,6 +4,7 @@ const QRCode = require("qrcode");
 const { pool } = require("../config/db");
 const { v4: uuidv4 } = require("uuid");
 
+// ✅ init Omise
 const omise = Omise({
   secretKey: process.env.OMISE_SECRET_KEY,
   omiseVersion: "2019-05-29",
@@ -149,5 +150,41 @@ exports.getPaymentStatus = async (req, res) => {
     return res
       .status(500)
       .json({ success: false, message: err.message || "Server error" });
+  }
+};
+
+/**
+ * 🧾 Confirm Payment → update DB (จากเพื่อน)
+ */
+exports.confirmPayment = async (req, res) => {
+  try {
+    const { chargeId, customerId, points } = req.body;
+
+    if (!chargeId || !customerId) {
+      return res.status(400).json({ success: false, message: "Missing data" });
+    }
+
+    // ตรวจสอบ charge จาก Omise
+    const charge = await omise.charges.retrieve(chargeId);
+
+    if (charge.status !== "successful") {
+      return res.status(400).json({ success: false, message: "Payment not confirmed yet" });
+    }
+
+    // บันทึกการชำระเงินลง DB
+    await pool.query(
+      "INSERT INTO payment_history (customer_id, amount, charge_id, status) VALUES ($1, $2, $3, $4)",
+      [customerId, charge.amount / 100, chargeId, charge.status]
+    );
+
+    // เพิ่มแต้มให้ลูกค้า (ถ้ามีระบบ point)
+    if (points) {
+      await pool.query("UPDATE customers SET points = points + $1 WHERE id = $2", [points, customerId]);
+    }
+
+    res.json({ success: true, message: "Payment confirmed", charge });
+  } catch (err) {
+    console.error("Confirm Payment error:", err);
+    res.status(500).json({ success: false, message: err.message });
   }
 };

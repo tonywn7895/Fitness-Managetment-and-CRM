@@ -33,38 +33,38 @@ const Home = () => {
       <section className="py-10 bg-black grid grid-cols-1 md:grid-cols-4 gap-8 px-6 md:px-20">
         <motion.div
             className="flex flex-col items-center text-center bg-black p-6 rounded-lg shadow-lg"
-            whileHover={{ scale: 1.1, boxShadow: "0 0 15px rgba(250, 255, 1, 0.5)" }} // ขยาย 10% และ glow สีเหลือง
+            whileHover={{ scale: 1.1, boxShadow: "0 0 15px rgba(250, 255, 1, 0.5)" }}
             transition={{ duration: 0.3 }}
         >
           <FaRunning size={50} className="text-yellow-400 mb-4" />
-            <p className="font-bold">เหมาะกับทุกไลฟ์สไตล์</p>
+          <p className="font-bold">เหมาะกับทุกไลฟ์สไตล์</p>
         </motion.div>
 
         <motion.div
             className="flex flex-col items-center text-center bg-black p-6 rounded-lg shadow-lg"
-            whileHover={{ scale: 1.1, boxShadow: "0 0 15px rgba(250, 255, 1, 0.5)" }} // ขยาย 10% และ glow สีเหลือง
+            whileHover={{ scale: 1.1, boxShadow: "0 0 15px rgba(250, 255, 1, 0.5)" }}
             transition={{ duration: 0.3 }}
         >
           <FaDumbbell size={50} className="text-yellow-400 mb-4" />
-            <p className="font-bold">มีอุปกรณ์ที่หลากหลาย</p>
+          <p className="font-bold">มีอุปกรณ์ที่หลากหลาย</p>
         </motion.div>
           
-          <motion.div
+        <motion.div
             className="flex flex-col items-center text-center bg-black p-6 rounded-lg shadow-lg"
-            whileHover={{ scale: 1.1, boxShadow: "0 0 15px rgba(250, 255, 1, 0.5)" }} // ขยาย 10% และ glow สีเหลือง
+            whileHover={{ scale: 1.1, boxShadow: "0 0 15px rgba(250, 255, 1, 0.5)" }}
             transition={{ duration: 0.3 }}
         >
           <FaUserFriends size={50} className="text-yellow-400 mb-4" />
-            <p className="font-bold">มีเทรนเนอร์ที่มากประสบการณ์</p>
+          <p className="font-bold">มีเทรนเนอร์ที่มากประสบการณ์</p>
         </motion.div>
 
         <motion.div
             className="flex flex-col items-center text-center bg-black p-6 rounded-lg shadow-lg"
-            whileHover={{ scale: 1.1, boxShadow: "0 0 15px rgba(250, 255, 1, 0.5)" }} // ขยาย 10% และ glow สีเหลือง
+            whileHover={{ scale: 1.1, boxShadow: "0 0 15px rgba(250, 255, 1, 0.5)" }}
             transition={{ duration: 0.3 }}
         >
           <FaPeopleCarry size={50} className="text-yellow-400 mb-4" />
-            <p className="font-bold">มีกิจกรรมสนุกและหลากหลาย</p>
+          <p className="font-bold">มีกิจกรรมสนุกและหลากหลาย</p>
         </motion.div>
       </section>
     </div>

@@ -8,13 +8,28 @@ const Navbar = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    // เช็คว่ามี token ไหม
     const token = localStorage.getItem("token");
     if (token) {
       setIsLoggedIn(true);
       fetchProfile(token);
     }
   }, []);
+
+  // ✅ รวมฟังก์ชัน fetch จากทั้งสองฝั่ง
+  const fetchWhoami = async (token) => {
+    try {
+      const res = await fetch("http://localhost:5001/api/auth/whoami", {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (!res.ok) return null;
+      const d = await res.json();
+      const jwt = d?.data?.jwt || {};
+      const role = d?.data?.dbRole || jwt.role;
+      return { username: jwt.username, email: jwt.email, role };
+    } catch (_) {
+      return null;
+    }
+  };
 
   const fetchProfile = async (token) => {
     try {
@@ -23,11 +38,15 @@ const Navbar = () => {
       });
       const data = await response.json();
       if (data.success) {
-        setUserData(data.data);
+        const who = await fetchWhoami(token);
+        setUserData({ ...data.data, ...(who || {}) });
+        return;
       }
     } catch (err) {
       console.error("Error fetching profile:", err);
     }
+    const who = await fetchWhoami(token);
+    if (who) setUserData(who);
   };
 
   const handleLogout = () => {
@@ -37,24 +56,21 @@ const Navbar = () => {
     navigate("/");
   };
 
+  // ✅ ใช้รูปแบบแปลงรูปที่ถูกต้องใน browser
   const getProfileImage = () => {
-  if (userData?.profile_image) {
-    const base64String = btoa(
-      String.fromCharCode(...new Uint8Array(userData.profile_image.data))
-    );
-    return `data:image/jpeg;base64,${base64String}`;
-  }
-  return null;
-};
-
-
-  const toggleDropdown = () => {
-    setIsDropdownOpen(!isDropdownOpen);
+    if (userData?.profile_image) {
+      const base64String = btoa(
+        String.fromCharCode(...new Uint8Array(userData.profile_image.data))
+      );
+      return `data:image/jpeg;base64,${base64String}`;
+    }
+    return null;
   };
+
+  const toggleDropdown = () => setIsDropdownOpen(!isDropdownOpen);
 
   return (
     <nav className="fixed top-0 left-0 right-0 z-10 bg-black text-white flex justify-between items-center">
-
       {/* ---------- Logo ---------- */}
       <div className="flex items-center pl-4 pr-8 h-[100px]">
         <img
@@ -105,6 +121,20 @@ const Navbar = () => {
           Membership Plan
         </NavLink>
 
+        {/* ✅ เพิ่มเมนู Shop จากเพื่อน */}
+        <NavLink
+          to="/Shop"
+          className={({ isActive }) =>
+            `px-2 py-1 border-b-4 transition ${
+              isActive
+                ? "border-[#F4FF01] text-white"
+                : "border-transparent hover:text-yellow-400"
+            }`
+          }
+        >
+          Shop
+        </NavLink>
+
         <NavLink
           to="/Contact"
           className={({ isActive }) =>
@@ -117,6 +147,22 @@ const Navbar = () => {
         >
           Contact
         </NavLink>
+
+        {/* ✅ เก็บ comment ของเพื่อนไว้ (admin role) */}
+        {/* {(userData?.role === 'admin' || userData?.role === 'staff') && (
+          <NavLink
+            to="/admin/dashboard"
+            className={({ isActive }) =>
+              `px-2 py-1 border-b-4 transition ${
+                isActive
+                  ? "border-[#F4FF01] text-white"
+                  : "border-transparent hover:text-yellow-400"
+              }`
+            }
+          >
+            Admin
+          </NavLink>
+        )} */}
       </div>
 
       {/* ---------- Auth Buttons / Profile Dropdown ---------- */}
@@ -138,6 +184,7 @@ const Navbar = () => {
               </div>
             )}
           </button>
+
           {isDropdownOpen && (
             <div className="absolute right-0 mt-2 w-48 bg-gray-800 rounded-md shadow-lg z-10">
               <ul className="py-1">

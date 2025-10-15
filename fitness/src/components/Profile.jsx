@@ -77,7 +77,11 @@ export default function EditProfile() {
   const handleDelete = async () => {
   if (window.confirm("Are you sure you want to delete your account? This action cannot be undone.")) {
     try {
+<<<<<<< HEAD
       const response = await fetch("http://localhost:5001/api/profile/profile", {
+=======
+      const response = await fetch("http://localhost:5001/api/profile", {
+>>>>>>> origin/main
         method: "DELETE",
         headers: { Authorization: `Bearer ${token}` },
       });
