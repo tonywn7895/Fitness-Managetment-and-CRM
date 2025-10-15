@@ -38,14 +38,13 @@ exports.register = async (req, res) => {
 
 // Customer Login
 exports.login = async (req, res) => {
-  console.log("📩 Login request:", req.body); // debug
+  console.log("Login request:", req.body); // debug
   try {
     const { identifier, password } = req.body;
 
     if (!identifier || !password) {
       return res.status(400).json({ success: false, message: "Please provide email/username and password" });
     }
-
     
     const result = await pool.query(
       "SELECT id, username, email, password FROM customers WHERE username = $1 OR email = $1",

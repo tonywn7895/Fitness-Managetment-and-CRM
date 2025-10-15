@@ -4,7 +4,7 @@ import { Link } from "react-router-dom";
 const Sidebar = () => {
   const handleLogout = () => {
     localStorage.removeItem("token");
-    window.location.href = "/login"; // หรือใช้ navigate ถ้ามี context
+    window.location.href = "/";
   };
 
   return (
@@ -20,6 +20,12 @@ const Sidebar = () => {
             <Link to="/profile"   
               className="block py-2 px-4 rounded hover:bg-yellow-500">
                 Edit Profile
+            </Link>
+          </li>
+          <li>
+            <Link to="/myplan"   
+              className="block py-2 px-4 rounded hover:bg-yellow-500">
+                My Plan
             </Link>
           </li>
           <li>

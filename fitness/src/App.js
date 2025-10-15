@@ -14,6 +14,7 @@ import MembershipPlan from './components/MembershipPlan';
 import Contact from './components/Contact';
 import CustomerLogin from './components/Cust_Login';
 import Profile from './components/Profile';
+import MyPlan from "./components/MyPlan";
 import Password from './components/ChangePassword';
 import WorkoutLog from './components/WorkoutLog';
 import { useState, useEffect } from 'react';
@@ -51,6 +52,7 @@ function App() {
         <Route path="/Contact" element={<Contact />} />
         <Route path="/Login" element={<CustomerLogin />} />
         <Route path="/Profile" element={<Profile />} />
+        <Route path="/myplan" element={<MyPlan />} />
         <Route path="/Password" element={<Password />} />
         <Route path="/Workout Log" element={<WorkoutLog />} />
 

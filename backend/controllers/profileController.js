@@ -1,10 +1,12 @@
 const { pool } = require("../config/db");
 const bcrypt = require("bcrypt");
-const multer = require("multer");
 const path = require("path");
+const multer = require("multer")
+const { Buffer } = require("buffer");
+
 
 // ตั้งค่า multer สำหรับอัปโหลดไฟล์
-const storage = multer.memoryStorage(); // เก็บใน memory เป็น buffer
+const storage = multer.memoryStorage(); 
 const upload = multer({ storage, limits: { fileSize: 2 * 1024 * 1024 } });
 const uploadMiddleware = upload.single("profileImage");
 
@@ -28,7 +30,7 @@ exports.getProfile = async (req, res) => {
 
 // Update Profile (Edit Profile - Update username, email, profileImage)
 exports.editProfile = [
-  uploadMiddleware, // ต้องเป็น multer memoryStorage: upload.single('profileImage')
+  uploadMiddleware, // multer memoryStorage: upload.single('profileImage')
   async (req, res) => {
     const client = await pool.connect();
     try {
@@ -48,7 +50,7 @@ exports.editProfile = [
         return res.status(400).json({ success: false, message: "No data to update" });
       }
 
-      // Basic validation
+      // validation
       if (username && !/^[a-zA-Z0-9_.]{3,30}$/.test(username)) {
         return res.status(400).json({ success: false, message: "Username must be 3-30 chars, letters/numbers/._ allowed" });
       }
@@ -57,7 +59,7 @@ exports.editProfile = [
         return res.status(400).json({ success: false, message: "Invalid email format" });
       }
 
-      // File validation (ถ้ามี)
+      // File validation
       if (file) {
         if (!file.mimetype || !file.mimetype.startsWith("image/")) {
           return res.status(400).json({ success: false, message: "Uploaded file must be an image" });
@@ -80,7 +82,7 @@ exports.editProfile = [
       }
       const current = existingRows[0];
 
-      // ถ้ามีการเปลี่ยน username/email ให้เช็คซ้ำ (ยกเว้นตัวเอง)
+      // ถ้ามีการเปลี่ยน username/email ให้เช็คซ้ำ
       if (username && username !== current.username) {
         const dup = await client.query("SELECT id FROM customers WHERE username = $1 AND id <> $2", [username, userId]);
         if (dup.rows.length > 0) {
@@ -96,7 +98,6 @@ exports.editProfile = [
         }
       }
 
-      // สร้าง SQL แบบไดนามิกเพื่ออัปเดตเฉพาะฟิลด์ที่ส่งมา
       const sets = [];
       const values = [];
       let idx = 1;
@@ -118,14 +119,12 @@ exports.editProfile = [
 
       const updated = updatedRows[0];
 
-      // เตรียมค่า profile image สำหรับ response (ถ้ามี)
       let profileImageUrl = null;
       if (updated.profile_image) {
-        // ระวัง: การส่ง base64 อาจใหญ่ ถ้า DB เก็บ blob ระยะยาวควรใช้ URL แทน
+        const bufferData = Buffer.from(updated.profile_image);
         const mime = file && file.mimetype ? file.mimetype : "image/jpeg";
-        profileImageUrl = `data:${mime};base64,${updated.profile_image.toString("base64")}`;
+        profileImageUrl = `data:${mime};base64,${bufferData.toString("base64")}`;
       }
-
       res.json({
         success: true,
         message: "Profile updated",
@@ -145,44 +144,44 @@ exports.editProfile = [
   },
 ];
 
-
 // Change Password (Update password only)
 exports.changePassword = async (req, res) => {
   const userId = req.user.id;
   const { oldPassword, newPassword, confirmPassword } = req.body;
-
+  console.log("Change password request:", { userId, oldPassword: !!oldPassword, newPassword: !!newPassword }); // Debug เพื่อดูว่าข้อมูลมาถูกต้องไหม
   try {
+    if (!oldPassword || !newPassword || !confirmPassword) {
+      return res.status(400).json({ success: false, message: "All fields are required" });
+    }
+    if (newPassword !== confirmPassword) {
+      return res.status(400).json({ success: false, message: "New passwords do not match" });
+    }
+    if (newPassword.length < 8) {
+      return res.status(400).json({ success: false, message: "New password must be at least 8 characters" });
+    }
+
     const userResult = await pool.query("SELECT password FROM customers WHERE id = $1", [userId]);
+    console.log("User result length:", userResult.rows.length);
     if (userResult.rows.length === 0) {
       return res.status(404).json({ success: false, message: "User not found" });
     }
     const storedPassword = userResult.rows[0].password;
 
-    if (newPassword || confirmPassword) {
-      if (!oldPassword) {
-        return res.status(400).json({ success: false, message: "Old password is required to change password" });
-      }
-      const isMatch = await bcrypt.compare(oldPassword, storedPassword);
-      if (!isMatch) {
-        return res.status(401).json({ success: false, message: "Old password is incorrect" });
-      }
-      if (newPassword !== confirmPassword) {
-        return res.status(400).json({ success: false, message: "New passwords do not match" });
-      }
-      if (newPassword.length < 8) {
-        return res.status(400).json({ success: false, message: "New password must be at least 8 characters" });
-      }
-
-      const salt = await bcrypt.genSalt(10);
-      const hashedPassword = await bcrypt.hash(newPassword, salt);
-      const result = await pool.query(
-        "UPDATE customers SET password = $1 WHERE id = $2 RETURNING id",
-        [hashedPassword, userId]
-      );
-      res.json({ success: true, message: "Password updated", data: result.rows[0] });
-    } else {
-      res.status(400).json({ success: false, message: "New password is required" });
+    const isMatch = await bcrypt.compare(oldPassword, storedPassword);
+    console.log("Password match:", isMatch);
+    if (!isMatch) {
+      return res.status(401).json({ success: false, message: "Old password is incorrect" });
     }
+
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(newPassword, salt);
+    const result = await pool.query(
+      "UPDATE customers SET password = $1 WHERE id = $2 RETURNING id",
+      [hashedPassword, userId]
+    );
+    console.log("Update result:", result.rows); // Debug เพื่อดูว่าอัปเดตสำเร็จไหม
+
+    res.json({ success: true, message: "Password updated", data: result.rows[0] });
   } catch (err) {
     console.error("Change password error:", err);
     res.status(500).json({ success: false, message: "Server error" });
@@ -192,11 +191,18 @@ exports.changePassword = async (req, res) => {
 // Delete Profile (Delete)
 exports.deleteProfile = async (req, res) => {
   const userId = req.user.id;
+  console.log("Deleting profile for userId:", userId); // Debug
+  if (!userId) {
+    return res.status(400).json({ success: false, message: "Invalid user ID" });
+  }
   try {
-    await pool.query("DELETE FROM customers WHERE id = $1", [userId]);
+    const result = await pool.query("DELETE FROM customers WHERE id = $1 RETURNING *", [userId]);
+    if (result.rowCount === 0) {
+      return res.status(404).json({ success: false, message: "User not found" });
+    }
     res.json({ success: true, message: "Account deleted" });
   } catch (err) {
     console.error("Delete profile error:", err);
-    res.status(500).json({ success: false, message: "Server error" });
+    res.status(500).json({ success: false, message: "Server error: " + err.message }); 
   }
 };

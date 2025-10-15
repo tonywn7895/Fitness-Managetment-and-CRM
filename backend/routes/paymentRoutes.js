@@ -1,13 +1,14 @@
-const express = require("express");
+// routes/paymentRoutes.js
+const express = require('express');
 const router = express.Router();
-const { createQRCodePayment, confirmPayment } = require("../controllers/paymentController");
+const paymentController = require('../controllers/paymentController');
+const paymentWebhookController = require('../controllers/paymentWebhookController');
 
+// ✅ สร้าง QR/charge
+router.post('/qrcode', paymentController.createQRCodePayment);
 
-
-// สร้าง QR Code สำหรับการชำระเงิน
-router.post("/qrcode", createQRCodePayment);
-
-// Confirm Payment
-router.post("/confirm", confirmPayment);
+// ✅ ตรวจสอบสถานะ
+router.get('/status/:orderId', paymentController.getPaymentStatus);
+router.get('/entry-qr/:orderId', paymentController.getEntryQR);
 
 module.exports = router;

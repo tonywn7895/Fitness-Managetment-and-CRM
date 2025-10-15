@@ -38,11 +38,15 @@ const Navbar = () => {
   };
 
   const getProfileImage = () => {
-    if (userData?.profile_image) {
-      return `data:image/jpeg;base64,${Buffer.from(userData.profile_image).toString("base64")}`;
-    }
-    return null;
-  };
+  if (userData?.profile_image) {
+    const base64String = btoa(
+      String.fromCharCode(...new Uint8Array(userData.profile_image.data))
+    );
+    return `data:image/jpeg;base64,${base64String}`;
+  }
+  return null;
+};
+
 
   const toggleDropdown = () => {
     setIsDropdownOpen(!isDropdownOpen);
@@ -141,16 +145,25 @@ const Navbar = () => {
                   <NavLink
                     to="/profile"
                     onClick={() => setIsDropdownOpen(false)}
-                    className="block px-4 py-2 text-sm text-white hover:bg-gray-700 rounded-md"
+                    className="block px-4 py-2 text-sm text-white hover:bg-yellow-500 rounded-md"
                   >
                     Edit Profile
                   </NavLink>
                 </li>
                 <li>
                   <NavLink
+                    to="/myplan"
+                    onClick={() => setIsDropdownOpen(false)}
+                    className="block px-4 py-2 text-sm text-white hover:bg-yellow-500 rounded-md"
+                  >
+                    My Plan
+                  </NavLink>
+                </li>
+                <li>
+                  <NavLink
                     to="/Password"
                     onClick={() => setIsDropdownOpen(false)}
-                    className="block px-4 py-2 text-sm text-white hover:bg-gray-700 rounded-md"
+                    className="block px-4 py-2 text-sm text-white hover:bg-yellow-500 rounded-md"
                   >
                     Change Password
                   </NavLink>
@@ -159,7 +172,7 @@ const Navbar = () => {
                   <NavLink
                     to="/Workout Log"
                     onClick={() => setIsDropdownOpen(false)}
-                    className="block px-4 py-2 text-sm text-white hover:bg-gray-700 rounded-md"
+                    className="block px-4 py-2 text-sm text-white hover:bg-yellow-500 rounded-md"
                   >
                     Workout Log
                   </NavLink>

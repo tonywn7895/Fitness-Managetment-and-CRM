@@ -43,13 +43,13 @@ function LandingPage() {
     }
 
     try {
-      const response = await fetch('http://localhost:5001/api/register', { 
+      const response = await fetch('http://localhost:5001/api/auth/register', { 
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           ...formData,
-          subscription_status: 'pending', // เพิ่มค่าเริ่มต้นตามที่ server คาดหวัง
-          role: 'customer', // เพิ่ม role ตามที่ server คาดหวัง
+          subscription_status: 'Not Active', 
+          role: 'customer', 
         }),
       });
 
