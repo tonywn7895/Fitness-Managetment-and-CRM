@@ -18,7 +18,7 @@ export default function EditProfile() {
         return;
       }
       try {
-        const response = await fetch("http://localhost:5001/api/profile/profile", {
+        const response = await fetch("http://localhost:5001/api/profile", {
           headers: { Authorization: `Bearer ${token}` },
         });
         const data = await response.json();
@@ -75,29 +75,31 @@ export default function EditProfile() {
   };
 
   const handleDelete = async () => {
-  if (window.confirm("Are you sure you want to delete your account? This action cannot be undone.")) {
-    try {
-<<<<<<< HEAD
-      const response = await fetch("http://localhost:5001/api/profile/profile", {
-=======
-      const response = await fetch("http://localhost:5001/api/profile", {
->>>>>>> origin/main
-        method: "DELETE",
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      const data = await response.json();
-      if (data.success) {
-        toast.success("Account deleted successfully!");
-        localStorage.removeItem("token"); 
-        navigate("/");
-      } else {
-        toast.error(data.message);
-      }
-    } catch (err) {
-      toast.error("Server error");
+    if (!token) {
+      toast.error("No token found, please log in again");
+      navigate("/login");
+      return;
     }
-  }
-};
+
+    if (window.confirm("Are you sure you want to delete your account? This action cannot be undone.")) {
+      try {
+        const response = await fetch("http://localhost:5001/api/profile", {
+          method: "DELETE",
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        const data = await response.json();
+        if (data.success) {
+          toast.success("Account deleted successfully!");
+          localStorage.removeItem("token");
+          navigate("/");
+        } else {
+          toast.error(data.message);
+        }
+      } catch (err) {
+        toast.error("Server error");
+      }
+    }
+  };
 
   const getInitials = (name) => {
     return name
@@ -120,6 +122,7 @@ export default function EditProfile() {
         <div className="flex items-center justify-between mb-8">
           <h1 className="text-3xl font-bold text-white">Edit Profile</h1>
         </div>
+
         {userData && (
           <div className="space-y-5 mb-8">
             <div className="flex items-center space-x-4">
@@ -142,14 +145,13 @@ export default function EditProfile() {
               )}
               <input type="file" accept="image/*" onChange={handleImageChange} className="mt-4" />
             </div>
-            
-            
-              
-              <p className="text-lg font-semibold">Username: {userData.username}</p>
-              <p className="text-lg">Email: {userData.email}</p>
+
+            <div className="space-y-3 mb-6">
+              <p className="text-lg font-semibold">Current Username: {userData.username}</p>
+              <p className="text-lg">Current Email: {userData.email}</p>
               <p className="text-lg">Subscription Status: {userData.subscription_status || "Not subscribed"}</p>
-            
-            
+            </div>
+
             <input
               type="text"
               name="username"
@@ -174,7 +176,7 @@ export default function EditProfile() {
             </button>
 
             <button
-              onClick={() => handleDelete()}
+              onClick={handleDelete}
               className="w-full py-3 rounded-lg bg-red-600 text-white font-bold hover:bg-red-700 transition"
             >
               Delete Account

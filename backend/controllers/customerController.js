@@ -36,7 +36,7 @@ exports.getCustomerById = async (req, res) => {
   }
 };
 
-// ✅ Get total points (for dashboard)
+// ✅ Get total points
 exports.getTotalPoints = async (req, res) => {
   const { customer_id } = req.query;
   try {
@@ -150,6 +150,20 @@ exports.getHistory = async (req, res) => {
     res.json({ success: true, data: result.rows });
   } catch (err) {
     console.error("Get history error:", err);
+    res.status(500).json({ success: false, message: err.message });
+  }
+};
+
+// ✅ Delete customer
+exports.deleteCustomer = async (req, res) => {
+  const { id } = req.params;
+  try {
+    const result = await pool.query("DELETE FROM customers WHERE id=$1 RETURNING id", [id]);
+    if (result.rowCount === 0)
+      return res.status(404).json({ success: false, message: "Customer not found" });
+    res.json({ success: true, message: "Customer deleted successfully" });
+  } catch (err) {
+    console.error("Delete customer error:", err);
     res.status(500).json({ success: false, message: err.message });
   }
 };
